@@ -60,6 +60,18 @@ bool j1Scene::PreUpdate()
 bool j1Scene::Update(float dt)
 {	
 	App->map->Draw();
+	if (App->input->GetKey(SDL_SCANCODE_W)==KEY_REPEAT) {
+		link_pos.y--;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) {
+		link_pos.y++;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
+		link_pos.x++;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
+		link_pos.x--;
+	}
 	App->render->Blit(link, link_pos.x, link_pos.y);
 	return true;
 }
