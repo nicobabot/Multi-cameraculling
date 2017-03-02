@@ -15,6 +15,7 @@ class j1Textures;
 class j1Audio;
 class j1FileSystem;
 class j1Scene;
+class j1Scene2;
 class j1Map;
 class j1PathFinding;
 class j1Fonts;
@@ -56,6 +57,8 @@ public:
 	void SaveGame(const char* file) const;
 	void GetSaveGames(p2List<p2SString>& list_to_fill) const;
 
+	
+
 private:
 
 	// Load config file
@@ -80,6 +83,8 @@ private:
 	bool LoadGameNow();
 	bool SavegameNow() const;
 
+
+
 public:
 
 	// Modules
@@ -89,6 +94,7 @@ public:
 	j1Textures*			tex = NULL;
 	j1Audio*			audio = NULL;
 	j1Scene*			scene = NULL;
+	j1Scene2*			scene2 = NULL;
 	j1FileSystem*		fs = NULL;
 	j1Map*				map = NULL;
 	j1PathFinding*		pathfinding = NULL;

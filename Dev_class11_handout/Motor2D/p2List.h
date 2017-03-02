@@ -3,6 +3,7 @@
 
 #include "p2Defs.h"
 
+
 /**
 * Contains items from double linked list
 */
@@ -269,6 +270,7 @@ public:
 			while(tmp != NULL && tmp->next != NULL)
 			{
 				++ret;
+				
 				if(tmp->data > tmp->next->data)
 				{
 					SWAP(tmp->data, tmp->next->data);
@@ -281,6 +283,10 @@ public:
 
 		return ret;
 	}
+
+	
+
+	
 
 	/**
 	* returns the first apperance of data as index (-1 if not found)

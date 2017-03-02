@@ -28,11 +28,12 @@ j1App::j1App(int argc, char* args[]) : argc(argc), args(args)
 	tex = new j1Textures();
 	audio = new j1Audio();
 	scene = new j1Scene();
+	
 	fs = new j1FileSystem();
 	map = new j1Map();
 	pathfinding = new j1PathFinding();
 	font = new j1Fonts();
-	gui = new j1Gui();
+	
 
 	// Ordered for awake / Start / Update
 	// Reverse order of CleanUp
@@ -44,10 +45,12 @@ j1App::j1App(int argc, char* args[]) : argc(argc), args(args)
 	AddModule(map);
 	AddModule(pathfinding);
 	AddModule(font);
-	AddModule(gui);
+
 
 	// scene last
 	AddModule(scene);
+	
+
 
 	// render last to swap buffer
 	AddModule(render);
@@ -125,15 +128,17 @@ bool j1App::Awake()
 // Called before the first frame
 bool j1App::Start()
 {
+	SDL_StartTextInput();
 	PERF_START(ptimer);
 	bool ret = true;
 	p2List_item<j1Module*>* item;
 	item = modules.start;
-
+	
 	while(item != NULL && ret == true)
 	{
-		ret = item->data->Start();
-		item = item->next;
+		
+			ret = item->data->Start();		
+			item = item->next;
 	}
 	startup_time.Start();
 

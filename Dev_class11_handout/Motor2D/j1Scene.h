@@ -2,10 +2,11 @@
 #define __j1SCENE_H__
 
 #include "j1Module.h"
+#include "j1Gui.h"
+#include "SDL\include\SDL.h"
 
 struct SDL_Texture;
-class GuiImage;
-class GuiText;
+
 
 class j1Scene : public j1Module
 {
@@ -34,10 +35,14 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	
+
+
+	
 private:
-	SDL_Texture* debug_tex;
-	GuiImage* banner;
-	GuiText* text;
+	SDL_Texture *link;
+	iPoint link_pos;
+	
 };
 
 #endif // __j1SCENE_H__

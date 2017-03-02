@@ -6,6 +6,7 @@
 #include "j1Textures.h"
 #include "j1Map.h"
 #include <math.h>
+#include "j1Gui.h"
 
 j1Map::j1Map() : j1Module(), map_loaded(false)
 {
@@ -29,6 +30,7 @@ bool j1Map::Awake(pugi::xml_node& config)
 
 void j1Map::Draw()
 {
+
 	if(map_loaded == false)
 		return;
 
@@ -377,6 +379,7 @@ bool j1Map::LoadTilesetImage(pugi::xml_node& tileset_node, TileSet* set)
 	}
 	else
 	{
+		const char* paco = PATH(folder.GetString(), image.attribute("source").as_string());
 		set->texture = App->tex->Load(PATH(folder.GetString(), image.attribute("source").as_string()));
 		int w, h;
 		SDL_QueryTexture(set->texture, NULL, NULL, &w, &h);
@@ -422,13 +425,17 @@ bool j1Map::LoadLayer(pugi::xml_node& node, MapLayer* layer)
 		layer->data = new uint[layer->width*layer->height];
 		memset(layer->data, 0, layer->width*layer->height);
 
+		pugi::xml_node tile = layer_data.first_child();
+		const char* chain = tile.value();
+		char* temp = strtok((char*)chain, " ,.-");
 		int i = 0;
-		for(pugi::xml_node tile = layer_data.child("tile"); tile; tile = tile.next_sibling("tile"))
+		while (temp != nullptr)
 		{
-			layer->data[i++] = tile.attribute("gid").as_int(0);
+			int num = atoi(temp);
+			layer->data[i++] = num;
+			temp = strtok(NULL, ",");
 		}
 	}
-
 	return ret;
 }
 

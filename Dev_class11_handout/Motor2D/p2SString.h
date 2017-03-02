@@ -105,6 +105,52 @@ public:
 
 		return *this;
 	}
+	bool insert(int position, const char* text) {
+
+		if (this != NULL)
+		{
+			uint len = Length();
+			uint textSize = strlen(text);
+			if (position > len && position < 0) {
+				return false;
+			}
+			unsigned int need_size = len + textSize;
+
+			if (need_size > size)
+			{
+				char* tmp = str;
+				Alloc(need_size * 2);
+				strcpy_s(str, size, tmp);
+
+				delete[] tmp;
+				//copy all position+->end
+				memcpy(&str[position + textSize], &str[position], (size + 1) - position);
+				//insert text on position
+				memcpy(&str[position], text, textSize);
+			}
+			else {
+				memcpy(&str[position + textSize], &str[position], (size + 1) - position);
+				memcpy(&str[position], text, textSize);
+			}
+			return true;
+		}
+		return false;
+
+	}
+	bool erase(int position) {
+		if (this != NULL)
+		{
+			uint len = Length();
+
+			if (position > len && position < 0) {
+				return false;
+			}
+			memcpy(&str[position], &str[position + 1], (size)-position);
+			return true;
+		}
+		return false;
+
+	}
 
 	// Operators
 	bool operator== (const p2SString& string) const
@@ -353,6 +399,16 @@ public:
 		}
 		else
 			return 0;
+	}
+
+	bool Erase(int num) {
+		if (strlen(str) > 0) {
+			char* temp = str;
+			temp[strlen(temp) - 1] = '\0';
+			str = temp;
+			return true;
+		}
+		return false;
 	}
 
 private:

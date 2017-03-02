@@ -5,6 +5,7 @@
 #include "j1Window.h"
 #include "SDL/include/SDL.h"
 
+
 #define MAX_KEYS 300
 
 j1Input::j1Input() : j1Module()
@@ -87,6 +88,33 @@ bool j1Input::PreUpdate()
 				windowEvents[WE_QUIT] = true;
 			break;
 
+			case SDL_KEYDOWN:
+				if (SDL_IsTextInputActive()) {
+					if (event.key.keysym.sym == SDLK_BACKSPACE) {
+						lastInput.erase(cursorPos - 1);
+						if (cursorPos > 0) {
+							cursorPos--;
+						}
+					}
+					else if (event.key.keysym.sym == SDLK_LEFT) {
+						if (cursorPos > 0) {
+							cursorPos--;
+						}
+					}
+					else if (event.key.keysym.sym == SDLK_RIGHT) {
+						if (cursorPos < lastInput.Length()) {
+							cursorPos++;
+						}
+					}
+				}
+				break;
+			case SDL_TEXTINPUT:
+				lastInput.insert(cursorPos, event.text.text);
+				//lastInput += event.text.text;
+				cursorPos += strlen(event.text.text);
+				//text.SetString(textInput.GetString());
+				break;
+
 			case SDL_WINDOWEVENT:
 				switch(event.window.event)
 				{
@@ -106,6 +134,19 @@ bool j1Input::PreUpdate()
 					break;
 				}
 			break;
+
+		
+
+
+			/*case SDL_KEYDOWN:
+				
+				//App->scene->
+			{int x = 0; }
+				//App->scene->Pass->Input(event);
+				//char* text = (char*)App->scene->Pass->input_text.text;
+				//strcat(text, event.text.text);
+				break;
+				*/
 
 			case SDL_MOUSEBUTTONDOWN:
 				mouse_buttons[event.button.button - 1] = KEY_DOWN;
@@ -145,6 +186,8 @@ bool j1Input::GetWindowEvent(j1EventWindow ev)
 	return windowEvents[ev];
 }
 
+
+
 void j1Input::GetMousePosition(int& x, int& y)
 {
 	x = mouse_x;
@@ -155,4 +198,19 @@ void j1Input::GetMouseMotion(int& x, int& y)
 {
 	x = mouse_motion_x;
 	y = mouse_motion_y;
+}
+
+
+
+char* j1Input::GetLetter()
+{
+
+
+	return 0;
+}
+
+
+const char * j1Input::GetLastInput()
+{	
+	return lastInput.GetString();
 }

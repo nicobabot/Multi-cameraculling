@@ -15,11 +15,11 @@
   </font>
 
   <gui>
-    <atlas file="gui/atlas.png"/>
+    <atlas file="gui/sf2.png"/>
   </gui>
     
   <window>
-    <resolution width="1024" height="768" scale="1"/>
+    <resolution width="768" height="579" scale="1"/>
     <fullscreen value="false"/>
     <borderless value="false"/>
     <resizable value="false"/>

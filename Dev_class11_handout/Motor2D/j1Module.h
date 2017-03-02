@@ -9,7 +9,11 @@
 #include "p2SString.h"
 #include "PugiXml\src\pugixml.hpp"
 
+
+
 class j1App;
+class UI_Component;
+
 
 class j1Module
 {
@@ -71,6 +75,7 @@ public:
 	{
 		return true;
 	}
+
 
 public:
 
