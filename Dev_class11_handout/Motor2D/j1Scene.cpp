@@ -32,7 +32,7 @@ bool j1Scene::Awake()
 // Called before the first frame
 bool j1Scene::Start()
 {
-	if(App->map->Load("iso_walk.tmx") == true)
+	if(App->map->Load("Test_Map_Zelda.tmx") == true)
 	{
 		int w, h;
 		uchar* data = NULL;
@@ -106,7 +106,7 @@ bool j1Scene::Update(float dt)
 
 
 	//if you want to see the map take the comment
-	//App->map->Draw();
+	App->map->Draw();
 
 	int x, y;
 	App->input->GetMousePosition(x, y);
