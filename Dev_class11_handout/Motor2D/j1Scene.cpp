@@ -47,6 +47,8 @@ bool j1Scene::Start()
 {
 	App->map->Load("zelda_map.tmx");
 	link=App->tex->Load("textures/Link_Sprites copia.png");
+	link_pos.x = 200;
+	link_pos.y = 100;
 	return true;
 }
 
