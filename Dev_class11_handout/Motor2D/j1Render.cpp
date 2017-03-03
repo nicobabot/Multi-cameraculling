@@ -42,15 +42,22 @@ bool j1Render::Awake(pugi::xml_node& config)
 	}
 	else
 	{
+		//CAMERA W && H doesn't do anything
 		camera.w = App->win->screen_surface->w;
-		camera.h = App->win->screen_surface->h/2;
+		camera.h = App->win->screen_surface->h / 2;
 		camera.x = 0;
 		camera.y = 0;
 
-		camera_two.w = App->win->screen_surface->w;
-		camera_two.h = App->win->screen_surface->h / 2;
+
+		/*camera_two.w = 0;
+		camera_two.h = 0;
 		camera_two.x = 0;
-		camera_two.y = App->win->screen_surface->h / 2-150;
+		camera_two.y = 0;*/
+
+		camera_two.w = App->win->screen_surface->w;
+		camera_two.h = App->win->screen_surface->h / 2+50;
+		camera_two.x = 0;
+		camera_two.y = App->win->screen_surface->h / 2;
 	}
 
 	return ret;
@@ -138,54 +145,86 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 {
 	bool ret = true;
 	//this magic numbers are to show how works the camera culling
-	if (x >= -App->render->camera.x && x <= -App->render->camera.x + App->render->camera.w / App->win->GetScale()) {
-		if (y >= -App->render->camera.y && y <= -App->render->camera.y + App->render->camera.h / App->win->GetScale()) {
-			uint scale = App->win->GetScale();
+	if (x >= -App->render->camera.x && x <= -App->render->camera.x + App->render->camera.w / App->win->GetScale() ) {
+		if (y >= -App->render->camera.y && y <= -App->render->camera.y + App->render->camera.h / App->win->GetScale() ) {
+			
+	
+		uint scale = App->win->GetScale();
 
-			SDL_Rect rect;
-			rect.x = (int)(camera.x * speed) + x * scale;
-			rect.y = (int)(camera.y * speed) + y * scale;
-			SDL_Rect rect_two;
-			rect_two.x = (int)(camera_two.x * speed) + x * scale;
-			rect_two.y = (int)(camera_two.y * speed) + y * scale;
+		SDL_Rect rect;
+		rect.x = (int)(camera.x * speed) + x * scale;
+		rect.y = (int)(camera.y * speed) + y * scale;
+		
 
+		if (section != NULL)
+		{
+			rect.w = section->w;
+			rect.h = section->h;
 
-			if (section != NULL)
-			{
-				rect.w = section->w;
-				rect.h = section->h;
-
-				rect_two.w = section->w;
-				rect_two.h = section->h;
-			}
-			else
-			{
-				SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
-				SDL_QueryTexture(texture, NULL, NULL, &rect_two.w, &rect_two.h);
-			}
-
-			rect.w *= scale;
-			rect.h *= scale;
-
-			rect_two.w *= scale;
-			rect_two.h *= scale;
-
-			SDL_Point* p = NULL;
-			SDL_Point pivot;
-
-			if (pivot_x != INT_MAX && pivot_y != INT_MAX)
-			{
-				pivot.x = pivot_x;
-				pivot.y = pivot_y;
-				p = &pivot;
-			}
-
-			if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0 || SDL_RenderCopyEx(renderer, texture, section, &rect_two, angle, p, SDL_FLIP_NONE) != 0)
-			{
-				//LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
-				ret = false;
-			}
 		}
+		else
+		{
+			SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
+		}
+
+		rect.w *= scale;
+		rect.h *= scale;
+
+		SDL_Point* p = NULL;
+		SDL_Point pivot;
+
+		if (pivot_x != INT_MAX && pivot_y != INT_MAX)
+		{
+			pivot.x = pivot_x;
+			pivot.y = pivot_y;
+			p = &pivot;
+		}
+
+		if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0 )
+		{
+			//LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
+			ret = false;
+		}
+
+		}
+	}
+	if (x >= -App->render->camera_two.x && x <= -App->render->camera_two.x + App->render->camera_two.w / App->win->GetScale()) {
+		uint scale = App->win->GetScale();
+		SDL_Rect rect_two;
+
+		rect_two.x = (int)(camera_two.x * speed) + x * scale;
+		rect_two.y = (int)(camera_two.y * speed) + y * scale;
+
+		if (section != NULL)
+		{
+			rect_two.w = section->w;
+			rect_two.h = section->h;
+		}
+		else {
+			SDL_QueryTexture(texture, NULL, NULL, &rect_two.w, &rect_two.h);
+		}
+
+		rect_two.w *= scale;
+		rect_two.h *= scale;
+
+		SDL_Point* p = NULL;
+		SDL_Point pivot;
+
+		if (pivot_x != INT_MAX && pivot_y != INT_MAX)
+		{
+			pivot.x = pivot_x;
+			pivot.y = pivot_y;
+			p = &pivot;
+		}
+
+		if (SDL_RenderCopyEx(renderer, texture, section, &rect_two, angle, p, SDL_FLIP_NONE) != 0)
+		{
+			//LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
+			ret = false;
+		}
+
+
+
 	}
 	return ret;
 }
