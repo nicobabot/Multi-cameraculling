@@ -49,6 +49,13 @@ bool j1Scene::Start()
 	link=App->tex->Load("textures/Link_Sprites copia.png");
 	link_pos.x = 200;
 	link_pos.y = 100;
+	/*App->render->camera.h /= 2;
+	SDL_Rect new_viewport=App->render->camera;
+	App->render->SetViewPort(new_viewport);*/
+	
+	
+
+
 	return true;
 }
 
@@ -62,6 +69,7 @@ bool j1Scene::PreUpdate()
 bool j1Scene::Update(float dt)
 {	
 	App->map->Draw();
+
 	if (App->input->GetKey(SDL_SCANCODE_W)==KEY_REPEAT) {
 		link_pos.y--;
 	}
