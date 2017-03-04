@@ -144,7 +144,7 @@ iPoint j1Render::ScreenToWorld(int x, int y) const
 bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section, float speed, double angle, int pivot_x, int pivot_y) const
 {
 	bool ret = true;
-	//this magic numbers are to show how works the camera culling
+	
 	if (x >= -App->render->camera.x && x <= -App->render->camera.x + App->render->camera.w / App->win->GetScale() ) {
 		if (y >= -App->render->camera.y && y <= -App->render->camera.y + App->render->camera.h / App->win->GetScale() ) {
 			
