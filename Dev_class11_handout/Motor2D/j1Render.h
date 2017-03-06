@@ -48,9 +48,11 @@ public:
 public:
 
 	SDL_Renderer*	renderer;
+	SDL_Renderer*	renderer_two;
 	SDL_Rect		camera;
 	SDL_Rect		camera_two;
 	SDL_Rect		viewport;
+	SDL_Rect		viewport_two;
 	SDL_Color		background;
 };
 

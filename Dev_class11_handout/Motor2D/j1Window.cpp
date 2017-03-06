@@ -78,6 +78,7 @@ bool j1Window::Awake(pugi::xml_node& config)
 		}
 	}
 
+
 	return ret;
 }
 

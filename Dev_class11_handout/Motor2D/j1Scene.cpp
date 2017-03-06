@@ -68,22 +68,43 @@ bool j1Scene::Update(float dt)
 {	
 	App->map->Draw();
 
+	
+
 	if (App->input->GetKey(SDL_SCANCODE_W)==KEY_REPEAT) {
 		link_pos.y--;
-		App->render->camera.y++;
+	//	App->render->camera.y++;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) {
 		link_pos.y++;
-		App->render->camera.y--;
+		//App->render->camera.y--;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
 		link_pos.x++;
-		App->render->camera.x++;
+		//App->render->camera.x++;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
 		link_pos.x--;
-		App->render->camera.x--;
+		//App->render->camera.x--;
 	}
+
+
+	uint x, y;
+	App->win->GetWindowSize(x, y);
+	
+	int movementx = -link_pos.x * App->win->GetScale() + x/2-8 ;
+	int movementy = -link_pos.y * App->win->GetScale() + (y/2)/ 2-8;
+
+	App->render->camera.x = movementx;
+	App->render->camera.y = movementy;
+
+	App->render->camera_two.x = movementx;
+	App->render->camera_two.y = movementy;
+
+
+
+	//App->render->DrawQuad(App->render->camera_two, 255, 255, 255, 200, true, false);
+
+
 
 	App->render->Blit(link, link_pos.x, link_pos.y);
 	return true;
