@@ -75,19 +75,15 @@ bool j1Scene::Update(float dt)
 
 	if (App->input->GetKey(SDL_SCANCODE_W)==KEY_REPEAT) {
 		link_pos.y--;
-	//	App->render->camera.y++;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) {
 		link_pos.y++;
-		//App->render->camera.y--;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
 		link_pos.x++;
-		//App->render->camera.x++;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
 		link_pos.x--;
-		//App->render->camera.x--;
 	}
 
 
@@ -103,19 +99,15 @@ bool j1Scene::Update(float dt)
 
 	if (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
 		p2_pos.y--;
-		//	App->render->camera.y++;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT) {
 		p2_pos.y++;
-		//App->render->camera.y--;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT) {
 		p2_pos.x++;
-		//App->render->camera.x++;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT) {
 		p2_pos.x--;
-		//App->render->camera.x--;
 	}
 
 
@@ -125,9 +117,6 @@ bool j1Scene::Update(float dt)
 	App->render->camera_two.x = movementx;
 	App->render->camera_two.y = movementy;
 
-
-
-	//App->render->DrawQuad(App->render->camera_two, 255, 255, 255, 200, true, false);
 
 	
 	App->render->Blit(p2, p2_pos.x, p2_pos.y);
