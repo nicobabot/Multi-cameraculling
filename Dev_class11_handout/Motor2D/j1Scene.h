@@ -41,7 +41,8 @@ public:
 	
 private:
 	SDL_Texture *link;
-	iPoint link_pos;
+	SDL_Texture *p2;
+	iPoint link_pos,p2_pos;
 
 	
 	

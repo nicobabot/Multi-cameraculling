@@ -47,6 +47,9 @@ bool j1Scene::Start()
 {
 	App->map->Load("zelda_map.tmx");
 	link=App->tex->Load("textures/Link_Sprites copia.png");
+	p2 = App->tex->Load("textures/Link_Sprites2.png");
+	p2_pos.x = 100;
+	p2_pos.y = 50;
 	link_pos.x = 200;
 	link_pos.y = 100;
 	
@@ -97,6 +100,28 @@ bool j1Scene::Update(float dt)
 	App->render->camera.x = movementx;
 	App->render->camera.y = movementy;
 
+
+	if (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
+		p2_pos.y--;
+		//	App->render->camera.y++;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT) {
+		p2_pos.y++;
+		//App->render->camera.y--;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT) {
+		p2_pos.x++;
+		//App->render->camera.x++;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT) {
+		p2_pos.x--;
+		//App->render->camera.x--;
+	}
+
+
+	movementx = -p2_pos.x * App->win->GetScale() + x / 2 - 8;
+	movementy = -p2_pos.y * App->win->GetScale() + (y / 2) / 2 - 8;
+
 	App->render->camera_two.x = movementx;
 	App->render->camera_two.y = movementy;
 
@@ -104,8 +129,8 @@ bool j1Scene::Update(float dt)
 
 	//App->render->DrawQuad(App->render->camera_two, 255, 255, 255, 200, true, false);
 
-
-
+	
+	App->render->Blit(p2, p2_pos.x, p2_pos.y);
 	App->render->Blit(link, link_pos.x, link_pos.y);
 	return true;
 }
