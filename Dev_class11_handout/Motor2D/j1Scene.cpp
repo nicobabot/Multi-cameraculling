@@ -93,8 +93,8 @@ bool j1Scene::Update(float dt)
 	int movementx = -link_pos.x * App->win->GetScale() + x/2-8 ;
 	int movementy = -link_pos.y * App->win->GetScale() + (y/2)/ 2-8;
 
-	App->render->camera.x = movementx;
-	App->render->camera.y = movementy;
+	App->render->camera_c.camera_move.x = movementx;
+	App->render->camera_c.camera_move.y = movementy;
 
 
 	if (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
@@ -114,8 +114,8 @@ bool j1Scene::Update(float dt)
 	movementx = -p2_pos.x * App->win->GetScale() + x / 2 - 8;
 	movementy = -p2_pos.y * App->win->GetScale() + (y / 2) / 2 - 8;
 
-	App->render->camera_two.x = movementx;
-	App->render->camera_two.y = movementy;
+	App->render->camera_c_two.camera_move.x = movementx;
+	App->render->camera_c_two.camera_move.y = movementy;
 
 
 	

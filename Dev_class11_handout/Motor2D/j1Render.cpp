@@ -43,15 +43,13 @@ bool j1Render::Awake(pugi::xml_node& config)
 	else
 	{
 		//CAMERA W && H doesn't do anything
-		camera.w = App->win->screen_surface->w;
-		camera.h = App->win->screen_surface->h / 2;
-		camera.x = 0;
-		camera.y = 0;
-
-		camera_two.w = App->win->screen_surface->w;
-		camera_two.h = App->win->screen_surface->h / 2+50;
-		camera_two.x = 0;
-		camera_two.y = App->win->screen_surface->h / 2;
+		
+		camera_c.camera_move = {0,0,App->win->screen_surface->w,App->win->screen_surface->h / 2 };
+		camera_c.viewport_camera = { 0,0,App->win->screen_surface->w,App->win->screen_surface->h / 2 };
+		Mycameras.push_back(&camera_c);
+		camera_c_two.camera_move = { 0,0,App->win->screen_surface->w,App->win->screen_surface->h / 2 };
+		camera_c_two.viewport_camera = { 0,App->win->screen_surface->h / 2,App->win->screen_surface->w,App->win->screen_surface->h / 2 };
+		Mycameras.push_back(&camera_c_two);
 	}
 
 	return ret;
@@ -61,16 +59,7 @@ bool j1Render::Awake(pugi::xml_node& config)
 bool j1Render::Start()
 {
 	LOG("render start");
-	// back background
-	//SDL_RenderGetViewport(renderer, &viewport_two);
-	//App->render->SetViewPort(camera);
-	//SetViewPort(camera_two);
-	//SDL_Rect viewport1 = { 0,0,camera.w,camera.h };
-	//SDL_RenderSetViewport(renderer, &viewport1);
-
-
-	//SDL_Rect viewport2 = { 0,camera.h,camera.w,camera.h };
-	//SDL_RenderSetViewport(renderer_two, &viewport2);
+	
 	return true;
 }
 
@@ -100,8 +89,8 @@ bool j1Render::CleanUp()
 // Load Game State
 bool j1Render::Load(pugi::xml_node& data)
 {
-	camera.x = data.child("camera").attribute("x").as_int();
-	camera.y = data.child("camera").attribute("y").as_int();
+	camera_c.camera_move.x = data.child("camera").attribute("x").as_int();
+	camera_c.camera_move.y = data.child("camera").attribute("y").as_int();
 
 	return true;
 }
@@ -111,8 +100,8 @@ bool j1Render::Save(pugi::xml_node& data) const
 {
 	pugi::xml_node cam = data.append_child("camera");
 
-	cam.append_attribute("x") = camera.x;
-	cam.append_attribute("y") = camera.y;
+	cam.append_attribute("x") = camera_c.camera_move.x;
+	cam.append_attribute("y") = camera_c.camera_move.y;
 
 	return true;
 }
@@ -129,7 +118,10 @@ void j1Render::SetViewPort(const SDL_Rect& rect)
 
 void j1Render::ResetViewPort()
 {
-	SDL_RenderSetViewport(renderer, &viewport);
+	for (std::list<Camera*>::const_iterator item = Mycameras.begin(); item != Mycameras.cend(); ++item) {
+		SDL_Rect reset_viewport = { 0,0,0,0 };
+		(*item)->viewport_camera = reset_viewport;
+	}
 }
 
 iPoint j1Render::ScreenToWorld(int x, int y) const
@@ -137,8 +129,8 @@ iPoint j1Render::ScreenToWorld(int x, int y) const
 	iPoint ret;
 	int scale = App->win->GetScale();
 
-	ret.x = (x - camera.x / scale);
-	ret.y = (y - camera.y / scale);
+	ret.x = (x - camera_c.camera_move.x / scale);
+	ret.y = (y - camera_c.camera_move.y / scale);
 
 	return ret;
 }
@@ -148,90 +140,55 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 {
 	bool ret = true;
 	
-	//if (x >= -App->render->camera.x && x <= -App->render->camera.x + App->render->camera.w / App->win->GetScale() ) {
-	//	if (y >= -App->render->camera.y && y <= -App->render->camera.y + App->render->camera.h / App->win->GetScale() ) {
-		
-	SDL_Rect newview = { 0,0,camera.w,camera.h };
-	SDL_RenderSetViewport(renderer, &newview);
 
-	uint scale = App->win->GetScale();
+	for (std::list<Camera*>::const_iterator item = Mycameras.begin(); item != Mycameras.cend(); ++item){
 
-	SDL_Rect rect;
-	rect.x = (int)(camera.x * speed) + x * scale;
-	rect.y = (int)(camera.y * speed) + y * scale;
+		//if (x >= -App->render->camera.x && x <= -App->render->camera.x + App->render->camera.w / App->win->GetScale() ) {
+		//if (y >= -App->render->camera.y && y <= -App->render->camera.y + App->render->camera.h / App->win->GetScale() ) {
 
+		App->render->SetViewPort((*item)->viewport_camera);
 
-	if (section != NULL)
-	{
-		rect.w = section->w;
-		rect.h = section->h;
+		uint scale = App->win->GetScale();
 
-	}
-	else
-	{
-		SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
-	}
-
-	rect.w *= scale;
-	rect.h *= scale;
-
-	SDL_Point* p = NULL;
-	SDL_Point pivot;
-
-	if (pivot_x != INT_MAX && pivot_y != INT_MAX)
-	{
-		pivot.x = pivot_x;
-		pivot.y = pivot_y;
-		p = &pivot;
-	}
-
-	if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0)
-	{
-		//LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
-		ret = false;
-	}
-
-	//SEPARATION
-	//newview = { 0,camera.h,camera.w,camera.h };
-	SDL_RenderSetViewport(renderer, NULL);
-
-	newview = { 0,camera.h,camera.w,camera.h };
-	SDL_RenderSetViewport(renderer, &newview);
-
-	rect.x = (int)(camera_two.x * speed) + x * scale;
-	rect.y = (int)(camera_two.y * speed) + y * scale;
+		SDL_Rect rect;
+		rect.x = (int)((*item)->camera_move.x * speed) + x * scale;
+		rect.y = (int)((*item)->camera_move.y * speed) + y * scale;
 
 
-	if (section != NULL)
-	{
-		rect.w = section->w;
-		rect.h = section->h;
+		if (section != NULL)
+		{
+			rect.w = section->w;
+			rect.h = section->h;
+
+		}
+		else
+		{
+			SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
+		}
+
+		rect.w *= scale;
+		rect.h *= scale;
+
+		SDL_Point* p = NULL;
+		SDL_Point pivot;
+
+		if (pivot_x != INT_MAX && pivot_y != INT_MAX)
+		{
+			pivot.x = pivot_x;
+			pivot.y = pivot_y;
+			p = &pivot;
+		}
+
+		if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0)
+		{
+			//LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
+			ret = false;
+		}
+
+
+		SDL_RenderSetViewport(renderer, NULL);
 
 	}
-	else
-	{
-		SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
-	}
-
-	rect.w *= scale;
-	rect.h *= scale;
-
-	SDL_Point* p1 = NULL;
-	SDL_Point pivot1;
-
-	if (pivot_x != INT_MAX && pivot_y != INT_MAX)
-	{
-		pivot1.x = pivot_x;
-		pivot1.y = pivot_y;
-		p1 = &pivot1;
-	}
-
-	if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p1, SDL_FLIP_NONE) != 0)
-	{
-		//LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
-		ret = false;
-	}
-	SDL_RenderSetViewport(renderer, NULL);
 	return ret;
 }
 
@@ -246,8 +203,8 @@ bool j1Render::DrawQuad(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a
 	SDL_Rect rec(rect);
 	if(use_camera)
 	{
-		rec.x = (int)(camera.x + rect.x * scale);
-		rec.y = (int)(camera.y + rect.y * scale);
+		rec.x = (int)(camera_c.camera_move.x + rect.x * scale);
+		rec.y = (int)(camera_c.camera_move.y + rect.y * scale);
 		rec.w *= scale;
 		rec.h *= scale;
 	}
@@ -274,7 +231,7 @@ bool j1Render::DrawLine(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 
 	int result = -1;
 
 	if(use_camera)
-		result = SDL_RenderDrawLine(renderer, camera.x + x1 * scale, camera.y + y1 * scale, camera.x + x2 * scale, camera.y + y2 * scale);
+		result = SDL_RenderDrawLine(renderer, camera_c.camera_move.x + x1 * scale, camera_c.camera_move.y + y1 * scale, camera_c.camera_move.x + x2 * scale, camera_c.camera_move.y + y2 * scale);
 	else
 		result = SDL_RenderDrawLine(renderer, x1 * scale, y1 * scale, x2 * scale, y2 * scale);
 

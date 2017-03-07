@@ -4,6 +4,13 @@
 #include "SDL/include/SDL.h"
 #include "p2Point.h"
 #include "j1Module.h"
+#include<list>;
+class Camera {
+public:
+	SDL_Rect camera_move;
+	SDL_Rect  viewport_camera;
+};
+
 
 class j1Render : public j1Module
 {
@@ -49,11 +56,11 @@ public:
 
 	SDL_Renderer*	renderer;
 	SDL_Renderer*	renderer_two;
-	SDL_Rect		camera;
-	SDL_Rect		camera_two;
+	Camera		camera_c;
+	Camera		camera_c_two;
 	SDL_Rect		viewport;
-	SDL_Rect		viewport_two;
 	SDL_Color		background;
+	std::list<Camera*> Mycameras;
 };
 
 #endif // __j1RENDER_H__
