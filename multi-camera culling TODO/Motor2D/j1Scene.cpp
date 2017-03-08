@@ -54,6 +54,9 @@ bool j1Scene::Start()
 	link_pos.y = 100;
 	
 
+	//TODO 3
+	//Initialize the two cameras one above the other as you saw in the solution.exe
+
 	camera_one=App->render->CreateCamera({ 0,0 }, { 0,0,App->win->screen_surface->w,App->win->screen_surface->h / 2 });
 	camera_two = App->render->CreateCamera({ 0,0 }, { 0,App->win->screen_surface->h / 2,App->win->screen_surface->w,App->win->screen_surface->h / 2 });
 	//camera_3= App->render->CreateCamera({ 0,0 }, { App->win->screen_surface->w/2,0,App->win->screen_surface->w,App->win->screen_surface->h / 2 });
@@ -76,14 +79,11 @@ bool j1Scene::Update(float dt)
 	App->render->Blit(p2, p2_pos.x, p2_pos.y);
 	App->render->Blit(link, link_pos.x, link_pos.y);
 	
-	//TODO 6
+	//TODO 5 
 	//Make the Green Link sprite move with W A S D
-	//TODO 7
 	//Make the Blue Link sprite move with UP LEFT DOWN RIGHT
+	//Make each camera to follow one Link
 
-	//TODO 8
-	//Make the sprites be in the center of the cameras and else
-	//make the cameras move with the movement of the sprite
 	if (App->input->GetKey(SDL_SCANCODE_W)==KEY_REPEAT) {
 		link_pos.y--;
 	}
@@ -97,7 +97,7 @@ bool j1Scene::Update(float dt)
 		link_pos.x--;
 	}
 
-
+	
 	uint x, y;
 	App->win->GetWindowSize(x, y);
 	

@@ -46,7 +46,7 @@ private:
 
 	Camera* camera_one;
 	Camera* camera_two;
-//	Camera* camera_3;
+//>	Camera* camera_3;
 };
 
 #endif // __j1SCENE_H__

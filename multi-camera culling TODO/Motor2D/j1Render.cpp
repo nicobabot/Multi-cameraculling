@@ -3,7 +3,7 @@
 #include "j1App.h"
 #include "j1Window.h"
 #include "j1Render.h"
-
+#include"j1Map.h"
 #define VSYNC true
 
 j1Render::j1Render() : j1Module()
@@ -43,15 +43,8 @@ bool j1Render::Awake(pugi::xml_node& config)
 	else
 	{
 	
-		//TODO 4
-		//Initialize the two cameras one above the other as you saw in the image on the PPT
-		//Add the two cameras to the list
-		/*camera_c.camera_move = {0,0};
-		camera_c.viewport_camera = { 0,0,App->win->screen_surface->w,App->win->screen_surface->h / 2 };
-		Mycameras.push_back(&camera_c);
-		camera_c_two.camera_move = { 0,0};
-		camera_c_two.viewport_camera = { 0,App->win->screen_surface->h / 2,App->win->screen_surface->w,App->win->screen_surface->h / 2 };
-		Mycameras.push_back(&camera_c_two);*/
+		
+		
 	}
 
 	return ret;
@@ -120,7 +113,7 @@ void j1Render::SetViewPort(const SDL_Rect& rect)
 
 void j1Render::ResetViewPort()
 {
-	for (std::list<Camera*>::const_iterator item = Mycameras.begin(); item != Mycameras.cend(); ++item) {
+	for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); item != Mycameras.cend(); ++item) {
 		SDL_Rect reset_viewport = { 0,0,0,0 };
 		(*item)->viewport_camera = reset_viewport;
 	}
@@ -142,26 +135,20 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 {
 	bool ret = true;
 	
-	//TODO 5
-	//Iterate all the cameras on the list
-	//Add with the function of SetViewPort the viewport of each camera 
-	//before printing something
+	//TODO 4
+	//Adapt Blit function for all the cameras in the list/array
+	//Remember that each cameras has his own viewport ;)
 
-	//Print the x and y of the object in function of the camera you are iterating
-	//Remember to set the viewport to null at the end
-
-	for (std::list<Camera*>::const_iterator item = Mycameras.begin(); item != Mycameras.cend(); ++item){
-
-	/*	if (x >= (*item)->viewport_camera.x && x <= (*item)->viewport_camera.x + (*item)->viewport_camera.w / App->win->GetScale()) {
-			if (y+(*item)->viewport_camera.y >= (*item)->viewport_camera.y && y+ (*item)->viewport_camera.y <= (*item)->viewport_camera.y + (*item)->viewport_camera.h / App->win->GetScale()) {
-			*/
-				App->render->SetViewPort((*item)->viewport_camera);
+	uint i = 0;
+	for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); i != Mycameras.size(); i++) {
+	
+				App->render->SetViewPort(item[i]->viewport_camera);
 
 				uint scale = App->win->GetScale();
 
 				SDL_Rect rect;
-				rect.x = (int)((*item)->camera_move.x * speed) + x * scale;
-				rect.y = (int)((*item)->camera_move.y * speed) + y * scale;
+				rect.x = (int)(item[i]->camera_move.x * speed) + x * scale;
+				rect.y = (int)(item[i]->camera_move.y * speed) + y * scale;
 
 
 				if (section != NULL)
@@ -196,9 +183,7 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 
 
 				SDL_RenderSetViewport(renderer, NULL);
-			//}
-		//}
-	}
+			}
 	return ret;
 }
 
@@ -289,6 +274,6 @@ Camera* j1Render::CreateCamera(iPoint position, SDL_Rect viewport) {
 
 	Camera* cam = new Camera(position, viewport);
 	Mycameras.push_back(cam);
-	
+
 	return cam;
 }
