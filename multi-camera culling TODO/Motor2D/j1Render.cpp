@@ -145,9 +145,9 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 	uint i = 0;
 	for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); i != Mycameras.size(); i++) {
 		
-		/*if (x >= -item[i]->camera_move.x / scale && x <= -1 * (item[i]->camera_move.x/scale - item[i]->viewport_camera.w/scale)) {
-			if (y >= -item[i]->camera_move.y / scale && y <= -1*(item[i]->camera_move.y/scale - item[i]->viewport_camera.h/scale)) {
-			*/
+		if (x >= -item[i]->camera_move.x / scale && x <= (-item[i]->camera_move.x/scale + item[i]->viewport_camera.w/scale)-20) {
+			if (y >= -item[i]->camera_move.y / scale && y <= (-item[i]->camera_move.y/scale + item[i]->viewport_camera.h/scale)-20) {
+			
 				App->render->SetViewPort(item[i]->viewport_camera);
 
 
@@ -186,8 +186,8 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 					ret = false;
 				}
 				SDL_RenderSetViewport(renderer, NULL);
-			//}
-		//}
+			}
+		}
 
 			
 		
