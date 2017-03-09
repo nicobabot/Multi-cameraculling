@@ -144,9 +144,10 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 	uint scale = App->win->GetScale();
 	uint i = 0;
 	for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); i != Mycameras.size(); i++) {
+		App->render->SetViewPort(item[i]->viewport_camera);
 		if (x >= -item[i]->camera_move.x / scale && x <= -1 * (item[i]->camera_move.x / scale - item[i]->viewport_camera.w / scale)) {
-			if (y >= -item[i]->camera_move.y / scale) {
-				App->render->SetViewPort(item[i]->viewport_camera);
+			if (y >= -item[i]->camera_move.y / scale && y <= -1*(item[i]->camera_move.y / scale - item[i]->viewport_camera.h / scale)) {
+				
 
 
 				SDL_Rect rect;
