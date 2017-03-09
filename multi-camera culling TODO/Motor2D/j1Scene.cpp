@@ -81,6 +81,7 @@ bool j1Scene::Update(float dt)
 	App->render->Blit(link, link_pos.x, link_pos.y,&Sprite_Rect);
 	/*camera_one->camera_move.x++;
 	link_pos.x++;*/
+
 	//SDL_Rect camera_Rect_two = { camera_two->camera_move.x,camera_two->camera_move.y,camera_two->viewport_camera.w,camera_two->viewport_camera.h };
 	
 	//App->render->DrawQuad(camera_Rect_two, 255, 255, 255, 80, true, false);
