@@ -141,13 +141,12 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 	//Adapt Blit function for all the cameras in the list/array
 	//Remember that each cameras has his own viewport ;)
 
+	uint scale = App->win->GetScale();
 	uint i = 0;
 	for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); i != Mycameras.size(); i++) {
-		//iPoint pos=ScreenToWorld(x, y, item[i]);
-		if (-(item[i]->viewport_camera.x - item[i]->camera_move.x) + x >= item[i]->viewport_camera.x && (x + section->w) <= (item[i]->viewport_camera.x + item[i]->viewport_camera.w*App->win->GetScale())) {
+		if ( x >= -item[i]->camera_move.x/scale && x+30 <= -1*(item[i]->camera_move.x / scale - item[i]->viewport_camera.w / scale) ) {
 			App->render->SetViewPort(item[i]->viewport_camera);
 		
-			uint scale = App->win->GetScale();
 
 			SDL_Rect rect;
 			rect.x = (int)(item[i]->camera_move.x * speed) + x * scale;
