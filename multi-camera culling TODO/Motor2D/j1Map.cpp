@@ -43,17 +43,16 @@ void j1Map::Draw()
 
 		if(layer->properties.Get("Nodraw") != 0)
 			continue;
-		for (std::vector<Camera*>::const_iterator item = App->render->Mycameras.begin(); i != App->render->Mycameras.size(); i++) {
+		//TODO 6
+		//Iterate all cameras and make sure that only the tiles that are inside the camera are calculated and later printed
+		
+		for (std::vector<Camera*>::const_iterator c_item = App->render->Mycameras.begin(); i != App->render->Mycameras.size(); i++) {
 			for (int y = 0; y < data.height; ++y)
 			{
-				//ESTO 
-				if (y >= item[i]->camera_move.y / scale && y <= (-item[i]->camera_move.y / scale + item[i]->viewport_camera.h / scale) - 20) {
-					//
+				if (y * 8 > -c_item[i]->camera_move.y / scale - 8 && y * 8 < -c_item[i]->camera_move.y / scale + c_item[i]->viewport_camera.h / scale) {
 					for (int x = 0; x < data.width; ++x)
 					{
-						// Y ESTO
-						if (x >= item[i]->camera_move.x / scale && x <= (-item[i]->camera_move.x / scale + item[i]->viewport_camera.w / scale) - 20) {
-							//
+						if (x*8 > -c_item[i]->camera_move.x / scale -8 && x*8 < -c_item[i]->camera_move.x / scale + c_item[i]->viewport_camera.w / scale) {
 							int tile_id = layer->Get(x, y);
 							if (tile_id > 0)
 							{
@@ -61,8 +60,13 @@ void j1Map::Draw()
 
 								SDL_Rect r = tileset->GetTileRect(tile_id);
 								iPoint pos = MapToWorld(x, y);
-
-								App->render->Blit(tileset->texture, pos.x, pos.y, &r, item[i]);
+								//TODO 7 
+								//Now you have to adapt the blit function to accept another argument (camera*)
+								//NOTE: Now you are iterating the vector twice (one here in map.cpp and other in blit render.cpp) and the map 
+								//is being printed two times for camera
+								//If now the blit function recives a camera it will only print in this camera
+								//but if the blit doesn't recives any camera will print the texture in all cameras that are in the array/list
+								App->render->Blit(tileset->texture, pos.x, pos.y, &r, c_item[i]);
 							}
 						}
 					}

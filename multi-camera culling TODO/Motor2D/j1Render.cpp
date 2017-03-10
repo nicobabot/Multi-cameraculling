@@ -81,25 +81,6 @@ bool j1Render::CleanUp()
 	return true;
 }
 
-// Load Game State
-bool j1Render::Load(pugi::xml_node& data)
-{
-	/*camera_c.camera_move.x = data.child("camera").attribute("x").as_int();
-	camera_c.camera_move.y = data.child("camera").attribute("y").as_int();
-	*/
-	return true;
-}
-
-// Save Game State
-bool j1Render::Save(pugi::xml_node& data) const
-{
-	pugi::xml_node cam = data.append_child("camera");
-/*
-	cam.append_attribute("x") = camera_c.camera_move.x;
-	cam.append_attribute("y") = camera_c.camera_move.y;
-	*/
-	return true;
-}
 
 void j1Render::SetBackgroundColor(SDL_Color color)
 {
@@ -136,27 +117,20 @@ iPoint j1Render::ScreenToWorld(int x, int y, Camera *camera) const
 bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section, Camera* cam, float speed, double angle, int pivot_x, int pivot_y) const
 {
 	bool ret = true;
-
-	//TODO 4
-	//Adapt Blit function for all the cameras in the list/array
-	//Remember that each cameras has his own viewport ;)
-
 	int scale = App->win->GetScale();
 	uint i = 0;
+
+	//TODO 5 
+	//Adapt blit to print on each camera 
+	//Make that only the textures inside the camera are printed
 	if (cam == nullptr) {
 		for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); i != Mycameras.size(); i++) {
-
-			if (x >= -item[i]->camera_move.x && x <= (-item[i]->camera_move.x+ item[i]->viewport_camera.w)) {
-				if (y >= -item[i]->camera_move.y && y <= (-item[i]->camera_move.y+ item[i]->viewport_camera.h ) ) {
-
+			if (x >= -item[i]->camera_move.x / scale && x <= (-item[i]->camera_move.x / scale + item[i]->viewport_camera.w / scale)) {
+				if (y >= -item[i]->camera_move.y / scale && y <= (-item[i]->camera_move.y / scale + item[i]->viewport_camera.h / scale) ) {
 					App->render->SetViewPort(item[i]->viewport_camera);
-
-
 					SDL_Rect rect;
 					rect.x = (int)(item[i]->camera_move.x * speed) + x * scale;
 					rect.y = (int)(item[i]->camera_move.y * speed) + y * scale;
-
-
 					if (section != NULL)
 					{
 						rect.w = section->w;
@@ -193,17 +167,12 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 	}
 	else {
 		i = 0;
-		if (x >= -cam->camera_move.x / scale && x <= (cam->camera_move.x / scale + cam->viewport_camera.w / scale) - 20) {
-			if (y >= -cam->camera_move.y / scale && y <= (-cam->camera_move.y / scale + cam->viewport_camera.h / scale) - 20) {
-
+		if (x >= -cam->camera_move.x / scale && x <= (-cam->camera_move.x / scale + cam->viewport_camera.w / scale)) {
+			if (y >= -cam->camera_move.y / scale && y <= (-cam->camera_move.y / scale + cam->viewport_camera.h / scale)) {
 				App->render->SetViewPort(cam->viewport_camera);
-
-
 				SDL_Rect rect;
 				rect.x = (int)(cam->camera_move.x * speed) + x * scale;
 				rect.y = (int)(cam->camera_move.y * speed) + y * scale;
-
-
 				if (section != NULL)
 				{
 					rect.w = section->w;
@@ -271,30 +240,6 @@ bool j1Render::DrawQuad(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a
 			ret = false;
 		}
 		
-	return ret;
-}
-
-bool j1Render::DrawLine(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool use_camera) const
-{
-	bool ret = true;
-	/*uint scale = App->win->GetScale();
-
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(renderer, r, g, b, a);
-
-	int result = -1;
-
-	if(use_camera)
-		result = SDL_RenderDrawLine(renderer, camera_c.camera_move.x + x1 * scale, camera_c.camera_move.y + y1 * scale, camera_c.camera_move.x + x2 * scale, camera_c.camera_move.y + y2 * scale);
-	else
-		result = SDL_RenderDrawLine(renderer, x1 * scale, y1 * scale, x2 * scale, y2 * scale);
-
-	if(result != 0)
-	{
-		LOG("Cannot draw quad to screen. SDL_RenderFillRect error: %s", SDL_GetError());
-		ret = false;
-	}
-	*/
 	return ret;
 }
 
