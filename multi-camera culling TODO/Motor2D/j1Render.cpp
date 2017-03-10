@@ -133,27 +133,75 @@ iPoint j1Render::ScreenToWorld(int x, int y, Camera *camera) const
 }
 
 // Blit to screen
-bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section, float speed, double angle, int pivot_x, int pivot_y) const
+bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section, Camera* cam, float speed, double angle, int pivot_x, int pivot_y) const
 {
 	bool ret = true;
-	
+
 	//TODO 4
 	//Adapt Blit function for all the cameras in the list/array
 	//Remember that each cameras has his own viewport ;)
 
 	int scale = App->win->GetScale();
 	uint i = 0;
-	for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); i != Mycameras.size(); i++) {
-		
-		if (x >= -item[i]->camera_move.x / scale && x <= (-item[i]->camera_move.x/scale + item[i]->viewport_camera.w/scale)-20) {
-			if (y >= -item[i]->camera_move.y / scale && y <= (-item[i]->camera_move.y/scale + item[i]->viewport_camera.h/scale)-20) {
-			
-				App->render->SetViewPort(item[i]->viewport_camera);
+	if (cam == nullptr) {
+		for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); i != Mycameras.size(); i++) {
+
+			if (x >= -item[i]->camera_move.x && x <= (-item[i]->camera_move.x+ item[i]->viewport_camera.w)) {
+				if (y >= -item[i]->camera_move.y && y <= (-item[i]->camera_move.y+ item[i]->viewport_camera.h ) ) {
+
+					App->render->SetViewPort(item[i]->viewport_camera);
+
+
+					SDL_Rect rect;
+					rect.x = (int)(item[i]->camera_move.x * speed) + x * scale;
+					rect.y = (int)(item[i]->camera_move.y * speed) + y * scale;
+
+
+					if (section != NULL)
+					{
+						rect.w = section->w;
+						rect.h = section->h;
+
+					}
+					else
+					{
+						SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
+					}
+
+					rect.w *= scale;
+					rect.h *= scale;
+
+					SDL_Point* p = NULL;
+					SDL_Point pivot;
+
+					if (pivot_x != INT_MAX && pivot_y != INT_MAX)
+					{
+						pivot.x = pivot_x;
+						pivot.y = pivot_y;
+						p = &pivot;
+					}
+
+					if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0)
+					{
+						//LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
+						ret = false;
+					}
+					SDL_RenderSetViewport(renderer, NULL);
+				}
+			}
+		}
+	}
+	else {
+		i = 0;
+		if (x >= -cam->camera_move.x / scale && x <= (cam->camera_move.x / scale + cam->viewport_camera.w / scale) - 20) {
+			if (y >= -cam->camera_move.y / scale && y <= (-cam->camera_move.y / scale + cam->viewport_camera.h / scale) - 20) {
+
+				App->render->SetViewPort(cam->viewport_camera);
 
 
 				SDL_Rect rect;
-				rect.x = (int)(item[i]->camera_move.x * speed) + x * scale;
-				rect.y = (int)(item[i]->camera_move.y * speed) + y * scale;
+				rect.x = (int)(cam->camera_move.x * speed) + x * scale;
+				rect.y = (int)(cam->camera_move.y * speed) + y * scale;
 
 
 				if (section != NULL)
@@ -188,10 +236,8 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 				SDL_RenderSetViewport(renderer, NULL);
 			}
 		}
-
-			
-		
-			}
+	
+	}
 	return ret;
 }
 

@@ -7,7 +7,7 @@
 #include "j1Map.h"
 #include <math.h>
 #include "j1Gui.h"
-
+#include"j1Window.h"
 j1Map::j1Map() : j1Module(), map_loaded(false)
 {
 	name.create("map");
@@ -30,7 +30,8 @@ bool j1Map::Awake(pugi::xml_node& config)
 
 void j1Map::Draw()
 {
-
+	int scale = App->win->GetScale();
+	uint i = 0;
 	if(map_loaded == false)
 		return;
 
@@ -42,20 +43,29 @@ void j1Map::Draw()
 
 		if(layer->properties.Get("Nodraw") != 0)
 			continue;
-
-		for(int y = 0; y < data.height; ++y)
-		{
-			for(int x = 0; x < data.width; ++x)
+		for (std::vector<Camera*>::const_iterator item = App->render->Mycameras.begin(); i != App->render->Mycameras.size(); i++) {
+			for (int y = 0; y < data.height; ++y)
 			{
-				int tile_id = layer->Get(x, y);
-				if(tile_id > 0)
-				{
-					TileSet* tileset = GetTilesetFromTileId(tile_id);
+				//ESTO 
+				if (y >= item[i]->camera_move.y / scale && y <= (-item[i]->camera_move.y / scale + item[i]->viewport_camera.h / scale) - 20) {
+					//
+					for (int x = 0; x < data.width; ++x)
+					{
+						// Y ESTO
+						if (x >= item[i]->camera_move.x / scale && x <= (-item[i]->camera_move.x / scale + item[i]->viewport_camera.w / scale) - 20) {
+							//
+							int tile_id = layer->Get(x, y);
+							if (tile_id > 0)
+							{
+								TileSet* tileset = GetTilesetFromTileId(tile_id);
 
-					SDL_Rect r = tileset->GetTileRect(tile_id);
-					iPoint pos = MapToWorld(x, y);
+								SDL_Rect r = tileset->GetTileRect(tile_id);
+								iPoint pos = MapToWorld(x, y);
 
-					App->render->Blit(tileset->texture, pos.x, pos.y, &r);
+								App->render->Blit(tileset->texture, pos.x, pos.y, &r, item[i]);
+							}
+						}
+					}
 				}
 			}
 		}
