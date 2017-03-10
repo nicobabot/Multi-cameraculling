@@ -94,25 +94,27 @@ void j1Render::SetViewPort(const SDL_Rect& rect)
 
 void j1Render::ResetViewPort()
 {
+	for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); item != Mycameras.cend(); ++item) {
 		SDL_Rect reset_viewport = { 0,0,0,0 };
-		SetViewPort(reset_viewport);
+		(*item)->viewport_camera = reset_viewport;
+	}
 }
 
-iPoint j1Render::ScreenToWorld(int x, int y) const
+iPoint j1Render::ScreenToWorld(int x, int y, Camera *camera) const
 {
 	iPoint ret;
 	int scale = App->win->GetScale();
 	
 	uint i = 0;
 	
-		ret.x = (x - camera.x / scale);
-		ret.y = (y - camera.y / scale);
+		ret.x = (x - camera->camera_move.x / scale);
+		ret.y = (y - camera->camera_move.y / scale);
 
 	return ret;
 }
 
 // Blit to screen
-bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section, float speed, double angle, int pivot_x, int pivot_y) const
+bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section, Camera* cam, float speed, double angle, int pivot_x, int pivot_y) const
 {
 	bool ret = true;
 	int scale = App->win->GetScale();
@@ -121,40 +123,65 @@ bool j1Render::Blit(SDL_Texture* texture, int x, int y, const SDL_Rect* section,
 	//TODO 5 
 	//Adapt blit to print on each camera 
 	//Make that only the textures inside the camera are printed
-					SDL_Rect rect;
-					rect.x = (int)(camera.x * speed) + x * scale;
-					rect.y = (int)(camera.y * speed) + y * scale;
-					if (section != NULL)
-					{
-						rect.w = section->w;
-						rect.h = section->h;
-
-					}
-					else
-					{
-						SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
-					}
-
-					rect.w *= scale;
-					rect.h *= scale;
-
-					SDL_Point* p = NULL;
-					SDL_Point pivot;
-
-					if (pivot_x != INT_MAX && pivot_y != INT_MAX)
-					{
-						pivot.x = pivot_x;
-						pivot.y = pivot_y;
-						p = &pivot;
-					}
-
-					if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0)
-					{
-						//LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
-						ret = false;
-					}
-					
+	if (cam == nullptr) {
+		for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); i != Mycameras.size(); i++) {
+			if (x >= -item[i]->camera_move.x / scale && x <= (-item[i]->camera_move.x / scale + item[i]->viewport_camera.w / scale)) {
+				if (y >= -item[i]->camera_move.y / scale && y <= (-item[i]->camera_move.y / scale + item[i]->viewport_camera.h / scale) ) {
+					App->render->SetViewPort(item[i]->viewport_camera);
+					App->render->PrintingTexture(texture, x, y, section, item[i], speed, angle, pivot_x, pivot_y);
+					SDL_RenderSetViewport(renderer, NULL);
+				}
+			}
+		}
+	}
+	else {
+		i = 0;
+		if (x >= -cam->camera_move.x / scale && x <= (-cam->camera_move.x / scale + cam->viewport_camera.w / scale)) {
+			if (y >= -cam->camera_move.y / scale && y <= (-cam->camera_move.y / scale + cam->viewport_camera.h / scale)) {
+				App->render->SetViewPort(cam->viewport_camera);
+				App->render->PrintingTexture(texture, x, y, section, cam, speed, angle, pivot_x, pivot_y);
+				SDL_RenderSetViewport(renderer, NULL);
+			}
+		}
+	
+	}
 	return ret;
+}
+
+void j1Render::PrintingTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* section , Camera* camera, float speed, double angle, int pivot_x, int pivot_y) {
+
+	int scale = App->win->GetScale();
+	SDL_Rect rect;
+	rect.x = (int)(camera->camera_move.x * speed) + x * scale;
+	rect.y = (int)(camera->camera_move.y * speed) + y * scale;
+	if (section != NULL)
+	{
+		rect.w = section->w;
+		rect.h = section->h;
+
+	}
+	else
+	{
+		SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
+	}
+
+	rect.w *= scale;
+	rect.h *= scale;
+
+	SDL_Point* p = NULL;
+	SDL_Point pivot;
+
+	if (pivot_x != INT_MAX && pivot_y != INT_MAX)
+	{
+		pivot.x = pivot_x;
+		pivot.y = pivot_y;
+		p = &pivot;
+	}
+
+	if (SDL_RenderCopyEx(renderer, texture, section, &rect, angle, p, SDL_FLIP_NONE) != 0)
+	{
+		//LOG("Cannot blit to screen. SDL_RenderCopy error: %s", SDL_GetError());
+	}
 }
 
 bool j1Render::DrawQuad(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool filled, bool use_camera) const
@@ -171,12 +198,12 @@ bool j1Render::DrawQuad(const SDL_Rect& rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a
 		SDL_Rect rec(rect);
 		if(use_camera)
 		{
-
-				rec.x = (int)(camera.x + rect.x * scale);
-				rec.y = (int)(camera.y + rect.y * scale);
+			for (std::vector<Camera*>::const_iterator item = Mycameras.begin(); i != Mycameras.size(); i++) {
+				rec.x = (int)(item[i]->camera_move.x + rect.x * scale);
+				rec.y = (int)(item[i]->camera_move.y + rect.y * scale);
 				rec.w *= scale;
 				rec.h *= scale;
-
+			}
 		}
 
 		int result = (filled) ? SDL_RenderFillRect(renderer, &rec) : SDL_RenderDrawRect(renderer, &rec);
@@ -218,4 +245,12 @@ bool j1Render::DrawCircle(int x, int y, int radius, Uint8 r, Uint8 g, Uint8 b, U
 	}
 
 	return ret;
+}
+
+Camera* j1Render::CreateCamera(iPoint position, SDL_Rect viewport) {
+
+	Camera* cam = new Camera(position, viewport);
+	Mycameras.push_back(cam);
+
+	return cam;
 }

@@ -44,9 +44,6 @@ private:
 	SDL_Texture *p2;
 	iPoint link_pos,p2_pos;
 
-	Camera* camera_one;
-	Camera* camera_two;
-//	Camera* camera_3;
 };
 
 #endif // __j1SCENE_H__

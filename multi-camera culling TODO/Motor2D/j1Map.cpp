@@ -46,13 +46,10 @@ void j1Map::Draw()
 		//TODO 6
 		//Iterate all cameras and make sure that only the tiles that are inside the camera are calculated and later printed
 		
-		for (std::vector<Camera*>::const_iterator c_item = App->render->Mycameras.begin(); i != App->render->Mycameras.size(); i++) {
 			for (int y = 0; y < data.height; ++y)
 			{
-				if (y * 8 > -c_item[i]->camera_move.y / scale - 8 && y * 8 < -c_item[i]->camera_move.y / scale + c_item[i]->viewport_camera.h / scale) {
 					for (int x = 0; x < data.width; ++x)
 					{
-						if (x*8 > -c_item[i]->camera_move.x / scale -8 && x*8 < -c_item[i]->camera_move.x / scale + c_item[i]->viewport_camera.w / scale) {
 							int tile_id = layer->Get(x, y);
 							if (tile_id > 0)
 							{
@@ -66,13 +63,10 @@ void j1Map::Draw()
 								//is being printed two times for camera
 								//If now the blit function recives a camera it will only print in this camera
 								//but if the blit doesn't recives any camera will print the texture in all cameras that are in the array/list
-								App->render->Blit(tileset->texture, pos.x, pos.y, &r, c_item[i]);
+								App->render->Blit(tileset->texture, pos.x, pos.y, &r);
 							}
 						}
 					}
-				}
-			}
-		}
 	}
 }
 

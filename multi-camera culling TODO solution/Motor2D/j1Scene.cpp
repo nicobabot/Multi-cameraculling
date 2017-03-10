@@ -10,11 +10,7 @@
 #include "j1PathFinding.h"
 #include "j1Gui.h"
 #include "j1Scene.h"
-
 #include "j1Gui.h"
-
-
-
 #include <stdio.h>
 #include <conio.h>
 #include <iostream>
@@ -45,17 +41,23 @@ bool j1Scene::Awake()
 // Called before the first frame
 bool j1Scene::Start()
 {
-	App->map->Load("zelda_map.tmx");
+	App->map->Load("zelda_map_7.tmx");
 	link=App->tex->Load("textures/Link_Sprites copia.png");
 	p2 = App->tex->Load("textures/Link_Sprites2.png");
-	p2_pos.x = 100;
-	p2_pos.y = 50;
-	link_pos.x = 200;
-	link_pos.y = 100;
+	p2_pos.x = 320;
+	p2_pos.y = 200;
+	link_pos.x = 300;
+	link_pos.y = 200;
 	
+
 	
+	//TODO 3
+	//Create two cameras (using your class and function)
+	//One camera will be above the other like in the solution.exe
+	camera_one=App->render->CreateCamera({ 0,0 }, { 0,0,App->win->screen_surface->w,App->win->screen_surface->h / 2 });
+	camera_two = App->render->CreateCamera({ 0,0 }, { 0,App->win->screen_surface->h / 2,App->win->screen_surface->w ,App->win->screen_surface->h / 2 });
 	
-	
+
 
 	return true;
 }
@@ -70,8 +72,10 @@ bool j1Scene::PreUpdate()
 bool j1Scene::Update(float dt)
 {	
 	App->map->Draw();
+	SDL_Rect Sprite_Rect = { 0,0,20,31 };
+	App->render->Blit(p2, p2_pos.x, p2_pos.y, &Sprite_Rect);
+	App->render->Blit(link, link_pos.x, link_pos.y,&Sprite_Rect);
 
-	
 
 	if (App->input->GetKey(SDL_SCANCODE_W)==KEY_REPEAT) {
 		link_pos.y--;
@@ -86,19 +90,12 @@ bool j1Scene::Update(float dt)
 		link_pos.x--;
 	}
 
-
-	uint x, y;
-	App->win->GetWindowSize(x, y);
-	
-	int movementx = -link_pos.x * App->win->GetScale() + x/2-8 ;
-	int movementy = -link_pos.y * App->win->GetScale() + (y/2)/ 2-8;
-
-	App->render->camera_c.camera_move.x = movementx;
-	App->render->camera_c.camera_move.y = movementy;
-
+	SDL_Rect camera_Rect = { 0,camera_one->viewport_camera.h ,camera_one->viewport_camera.w,10 };
+	App->render->DrawQuad(camera_Rect, 0, 0, 255, 255, true, false);
 
 	if (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
 		p2_pos.y--;
+
 	}
 	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT) {
 		p2_pos.y++;
@@ -111,16 +108,24 @@ bool j1Scene::Update(float dt)
 	}
 
 
+	//TODO 4 Make each camera to follow each link 
+	uint x, y;
+	App->win->GetWindowSize(x, y);
+	
+	int movementx = -link_pos.x * App->win->GetScale() + x  /2-8 ;
+	int movementy = -link_pos.y * App->win->GetScale() + (y/2)/ 2-8;
+
+	camera_one->camera_move.x = movementx;
+	camera_one->camera_move.y = movementy;
+
 	movementx = -p2_pos.x * App->win->GetScale() + x / 2 - 8;
 	movementy = -p2_pos.y * App->win->GetScale() + (y / 2) / 2 - 8;
 
-	App->render->camera_c_two.camera_move.x = movementx;
-	App->render->camera_c_two.camera_move.y = movementy;
-
-
+	camera_two->camera_move.x = movementx;
+	camera_two->camera_move.y = movementy;
 	
-	App->render->Blit(p2, p2_pos.x, p2_pos.y);
-	App->render->Blit(link, link_pos.x, link_pos.y);
+	
+
 	return true;
 }
 

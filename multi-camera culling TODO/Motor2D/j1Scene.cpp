@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <iostream>
-
+#include"j1Window.h"
 using namespace std;
 
 
@@ -54,10 +54,7 @@ bool j1Scene::Start()
 	//TODO 3
 	//Create two cameras (using your class and function)
 	//One camera will be above the other like in the solution.exe
-	camera_one=App->render->CreateCamera({ 0,0 }, { 0,0,App->win->screen_surface->w,App->win->screen_surface->h / 2 });
-	camera_two = App->render->CreateCamera({ 0,0 }, { 0,App->win->screen_surface->h / 2,App->win->screen_surface->w ,App->win->screen_surface->h / 2 });
-	
-
+	App->render->camera = { 0,0,App->win->screen_surface->w,App->win->screen_surface->h };
 
 	return true;
 }
@@ -89,8 +86,7 @@ bool j1Scene::Update(float dt)
 	if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
 		link_pos.x--;
 	}
-
-	SDL_Rect camera_Rect = { 0,camera_one->viewport_camera.h ,camera_one->viewport_camera.w,10 };
+	SDL_Rect camera_Rect = { 0,App->win->screen_surface->h,App->win->screen_surface->w,10 };
 	App->render->DrawQuad(camera_Rect, 0, 0, 255, 255, true, false);
 
 	if (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
@@ -108,21 +104,9 @@ bool j1Scene::Update(float dt)
 	}
 
 
-	//TODO 4 Make each camera to follow each link 
-	uint x, y;
-	App->win->GetWindowSize(x, y);
+	//TODO 4 
+	//Make each camera to follow each link 
 	
-	int movementx = -link_pos.x * App->win->GetScale() + x  /2-8 ;
-	int movementy = -link_pos.y * App->win->GetScale() + (y/2)/ 2-8;
-
-	camera_one->camera_move.x = movementx;
-	camera_one->camera_move.y = movementy;
-
-	movementx = -p2_pos.x * App->win->GetScale() + x / 2 - 8;
-	movementy = -p2_pos.y * App->win->GetScale() + (y / 2) / 2 - 8;
-
-	camera_two->camera_move.x = movementx;
-	camera_two->camera_move.y = movementy;
 	
 	
 
