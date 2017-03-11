@@ -56,7 +56,7 @@ public:
 	SDL_Rect		viewport;
 	SDL_Color		background;
 	//TODO 2
-	//Add a list or array of cameras? Wich is better?
+	//Add a list or array of cameras? Which is better?
 	//In this list/array we will store all the cameras 
 	//that we will use on the game
 	//Add also a function to create cameras
